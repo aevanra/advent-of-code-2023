@@ -7,22 +7,27 @@ import (
     "os"
 )
 
-func main() {
-    day1Input, err := os.Open("day1/input.txt")
+func get_input(file_name string) []string {
+    input, err := os.Open(file_name)
 
     if err != nil {
         panic("We cannot read!!!")
     }
 
-    scanner := bufio.NewScanner(day1Input)
+    scanner := bufio.NewScanner(input)
     scanner.Split(bufio.ScanLines)
 
-    trebuchet_input := make([]string, 0)
+    array_input := make([]string, 0)
 
     for scanner.Scan() {
-        trebuchet_input = append(trebuchet_input, scanner.Text())
+        array_input = append(array_input, scanner.Text())
     }
 
+    return array_input
+}
+
+func main() {
+    trebuchet_input := get_input("day1/input.txt")
     fmt.Println("Trebuchet Problem Part 1")
     fmt.Println(trebuchet.TrebuchetPart1(trebuchet_input))
     
