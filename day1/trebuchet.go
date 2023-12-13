@@ -69,37 +69,45 @@ func TrebuchetPart2(document []string) int {
         "eight": 8,
         "nine": 9,
     }
-    re := regexp.MustCompile(`\d|one|two|three|four|five|six|seven|eight|nine`)
+    re, err := regexp.Compile(`\d|one|two|three|four|five|six|seven|eight|nine`)
+        
+    if err != nil {
+        panic("You don't know regex")
+    }
+
 
     for _, v := range(document) {
-        digits := re.FindAllString(v, -1)
-        digits_int := make([]int, 0)
+        firstDigit := re.FindString(v)
+        lastDigit := ""
+        digits_int := make([]int,0)
 
-        if digits == nil {
-            continue
-        } else if len(digits) == 1 {
-            digits = append(digits, digits[0])
-            fmt.Println(digits)
-        } else {
-            digits = []string{digits[0], digits[len(digits)-1]}
-        }
-
-        if len(digits) > 2 {
-            fmt.Println(digits)
-        }
-
-        for i, match := range(digits) {
-
-            if i > 1 {
-                fmt.Println(i)
+        for lastDigit == "" {
+            if len(v) < 5 {
+                matches := re.FindAllString(v, -1)
+                lastDigit = matches[len(matches)-1]
+                break
             }
-
-            if len(match) > 2 {
-                
-                if stringToIntConversions[match] > 9 {
-                    fmt.Println(stringToIntConversions[match])
+            for i := len(v); i >= 0; i-- {
+                checkString := v[i-5:i]
+                matches := re.FindAllString(checkString, -1)
+                if len(matches) > 0 {
+                    lastDigit = matches[len(matches)-1]
                 }
 
+                if lastDigit != "" {    
+                    break
+                }
+            }
+        }
+
+        if lastDigit == "" {
+            panic("No Number Found???")
+        }
+
+        digits := []string{firstDigit, lastDigit}
+
+        for i, match := range(digits) {
+            if len(match) > 1 {
                 digits_int = append(digits_int, stringToIntConversions[match])
             } else {
                 d, err := strconv.Atoi(digits[i])
