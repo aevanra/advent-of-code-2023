@@ -1,29 +1,39 @@
 package trebuchet
 
 import (
-    "fmt"
     "strconv"
     "regexp"
 )
 
 func TrebuchetPart1(document []string) int {
+    first_digit := 0
+    last_digit := 0
     response := 0
     results := []int{}
 
-    for _, v := range(document) {
-        digits := make([]int, 0)   
 
-        for _, c := range(v) {
-            if digit, err := strconv.Atoi(string(c)); err == nil {
-                
-                digits = append(digits, digit) 
+    for _, v := range(document) {
+        for i := 0; i < len(v); i++ {
+            n, err := strconv.Atoi(string(v[i]))
+            if err == nil {
+                first_digit = n
+                break
             }
         }
-        
-        if len(digits) == 1 {
-            digits = append(digits, digits[0])
+
+        for i := len(v) - 1; i >= 0; i-- {
+            n, err := strconv.Atoi(string(v[i]))
+            if err == nil {
+                last_digit = n
+                break
+            }
         }
 
+        if last_digit == 0 {
+            last_digit = first_digit
+        }
+
+        digits := []int{first_digit, last_digit}
         results = append(results, getNum(digits))
     }
 
@@ -35,11 +45,6 @@ func TrebuchetPart1(document []string) int {
 }
 
 func getNum(s []int) int {
-    if len(s) > 1 {
-        s = []int{s[0], s[len(s)-1]} 
-    } else {
-        s = []int{s[0],s[0]}
-    }
     res := 0
     op := 1
 
@@ -51,8 +56,6 @@ func getNum(s []int) int {
     return res
 }
 
-// Can vastly improve the above by having a pointer at the beginning and a pointer at the end of every string and only 
-// searching until two numbers are found instead of finding each one -- may implement that may not.
 
 
 func TrebuchetPart2(document []string) int {
