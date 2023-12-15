@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "github.com/aevanra/advent-of-code-2023/day1"
+    "github.com/aevanra/advent-of-code-2023/day2"
     "bufio"
     "os"
 )
@@ -34,4 +35,11 @@ func main() {
     fmt.Println("\nTrebuchet Problem Part 2")
     fmt.Println(trebuchet.TrebuchetPart2(trebuchet_input))
     
+    cubeGameInput := get_input("day2/input.txt")
+
+    fmt.Println("Cube Game Problem Part 1")
+    fmt.Println(cube.CubeSolution1(cubeGameInput))
+
+    fmt.Println("Cube Game Problem Part 2")
+    fmt.Println(cube.CubeSolution2(cubeGameInput))
 }
