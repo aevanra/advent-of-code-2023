@@ -1,79 +1,70 @@
 package gondola
 
 import (
-    "fmt"
     "strconv"
     "regexp"
-    "strings"
 )
+
+func isSymbol(str string) bool {
+    symbolRe, _ := regexp.Compile(`[^\.\d]`)
+    chr := symbolRe.FindString(str)
+    return chr != ""
+}
+
+func dedupeSlice(strSlice []string) []string {
+    allKeys := make(map[string]bool)
+    list := []string{}
+    for _, item := range strSlice {
+        if _, value := allKeys[item]; !value {
+            allKeys[item] = true
+            list = append(list, item)
+        }
+    }
+    return list
+}
 
 func GondolaPart1(schematics []string) int {
     schemaSum := 0
     numRe, _ := regexp.Compile(`\d+`)
-    symbolRe, _ := regexp.Compile(`[^\.\d]`)
 
     for i := 0; i < len(schematics); i++ {
         lastRow := ""
-        thisRow := schematics[i]
+        thisRow := "." + schematics[i] + "."
         nextRow := ""
         if i > 0 {
-            lastRow = schematics[i-1]
+            lastRow = "." + schematics[i-1] + "."
         }
         if i < len(schematics)-1 {
-            nextRow = schematics[i+1]
+            nextRow = "." + schematics[i+1] + "."
         }
         foundNums := numRe.FindAllString(thisRow, -1)
+        foundNums = dedupeSlice(foundNums)
 
         for _, num := range(foundNums) {
-            baseIndex := strings.Index(thisRow, num)
-            indicesToCheck := make([]int, 0)
-            isValid := false
+            thisNumRe, _ := regexp.Compile(`[^\d]`+ num + `[^\d]`)
+            numIndices := thisNumRe.FindAllStringIndex(thisRow, -1)
 
-            for j := -1; j <= len(num); j++ {
-                indexToCheck := baseIndex + j 
+            for _, indices := range(numIndices) {
+                startIndex, endIndex := indices[0], indices[1]-1
+                thisNum, _ := strconv.Atoi(num)
 
-                if indexToCheck >= 0 && indexToCheck <= len(thisRow)-1 {
-                    indicesToCheck = append(indicesToCheck, indexToCheck)
+                if (startIndex >= 0 && isSymbol(string(thisRow[startIndex]))) ||
+                    (endIndex < len(thisRow) && isSymbol(string(thisRow[endIndex]))) {
+                    schemaSum += thisNum
+                    break
                 }
-            }
 
-            fmt.Println(indicesToCheck)
-            for _, index := range(indicesToCheck) {
-                fmt.Println(index)
-                if !isValid {
-                    thisString := symbolRe.FindString(string(thisRow[index]))
-                    if thisString != "" {
-                        isValid = true
-                        break
-                    }
+                for j := startIndex; j <= endIndex; j++ {
+                    if j < 0 || j >= len(thisRow) { continue }
 
-                    if lastRow != "" {
-                        thisString = symbolRe.FindString(string(lastRow[index]))
-                    }
-                    if thisString != "" {
-                        fmt.Println(string(lastRow[index]))
-                        isValid = true
-                        break
-                    }
-                    
-                    if nextRow != "" {
-                        thisString = symbolRe.FindString(string(nextRow[index]))
-                    }
-                    if thisString != "" {
-                        fmt.Println(string(nextRow[index]))
-                        isValid = true
+                    if (len(lastRow) > 0 && isSymbol(string(lastRow[j]))) ||
+                     (len(nextRow) > 0 && isSymbol(string(nextRow[j]))) {
+                        schemaSum += thisNum
                         break
                     }
                 }
-            }
-
-            if isValid {
-                number, _ := strconv.Atoi(num)
-                schemaSum += number
             }
         }
-        
     }
-
     return schemaSum
 }
