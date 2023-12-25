@@ -1,6 +1,7 @@
 package gondola
 
 import (
+    "unicode"
     "strconv"
     "regexp"
 )
@@ -67,4 +68,73 @@ func GondolaPart1(schematics []string) int {
         }
     }
     return schemaSum
+}
+
+func getNumbers(row string, index int, final bool) []int {
+    if row == "" {
+        return nil
+    }
+
+    nums := make([]int, 0)
+
+    if unicode.IsDigit(rune(row[index])) {
+        minIndex := index
+        maxIndex := index
+        for minIndex > 0 && unicode.IsDigit(rune(row[minIndex - 1])) {
+            minIndex = minIndex - 1
+        }
+        for maxIndex < len(row) - 1 && unicode.IsDigit(rune(row[maxIndex + 1])) {
+            maxIndex = maxIndex + 1
+        }
+
+        num, _ := strconv.Atoi(row[minIndex:maxIndex+1])
+        
+        return []int{num}
+    }
+
+    if index > 0 && unicode.IsDigit(rune(row[index - 1])) {
+        if !final{
+            nums = append(nums, getNumbers(row, index - 1, true)...)
+        }
+    }
+
+    if index < len(row) - 1 && unicode.IsDigit(rune(row[index + 1])) {
+        if !final{
+            nums = append(nums, getNumbers(row, index + 1, true)...)
+        }
+    }
+
+    return nums
+
+}
+
+func GondolaPart2(schematics []string) int {
+    ratioSum := 0
+
+    for i := 0; i < len(schematics); i++ {
+        rows := make([]string, 0)
+        rows = append(rows, schematics[i])
+        if i > 0 {
+            rows = append(rows, schematics[i-1])
+        }
+        if i < len(schematics)-1 {
+            rows = append(rows, schematics[i+1])
+        }
+
+        for ind, char := range(schematics[i]) {
+            adjNums := make([]int, 0)
+            if string(char) == "*" {
+                for _, row := range(rows) {
+                    adjNums = append(adjNums, getNumbers(row, ind, false)...)
+                }
+
+                if len(adjNums) == 2 {
+                    ratioSum += adjNums[0] * adjNums[1]
+                }
+            }
+        }
+
+    }
+
+    return ratioSum
 }
