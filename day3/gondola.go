@@ -3,7 +3,6 @@ package gondola
 import (
     "strconv"
     "regexp"
-    "strings"
     "unicode"
 )
 
